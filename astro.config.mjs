@@ -13,7 +13,7 @@ export default defineConfig({
   ...(buildingOnGitHub
     ? {
         site: `https://${githubOwner}.github.io`,
-        base: userSiteRepository ? '/' : `/${repositoryName}`,
+        base: userSiteRepository ? '/' : `/${repositoryName}/`,
       }
     : {}),
 });
