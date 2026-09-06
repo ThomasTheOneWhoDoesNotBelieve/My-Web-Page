@@ -1,0 +1,57 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+// DROP PHOTOS INTO: src/assets/wall/
+// Astro finds them automatically. No list needs to be edited.
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/wall/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
+  { eager: true }
+);
+
+const wallImages = Object.entries(modules)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([path, module]) => ({ path, image: module.default }));
+
+const photoCount = String(wallImages.length).padStart(3, '0');
+---
+<BaseLayout>
+  <SiteHeader />
+
+  <main>
+    <section class="hero">
+      <div class="hero-topline">
+        <span class="hero-kicker mono">PHOTOGRAPHY</span>
+        <span class="cross" aria-hidden="true">+</span>
+      </div>
+
+      <div class="hero-title-wrap">
+        <h1>
+          <span class="hero-line-main">SOMEWHERE</span>
+          <span class="hero-line-between">BETWEEN</span>
+          <span class="hero-line-main">MEMORY <b class="hero-inline-plus">+</b> GLASS</span>
+        </h1>
+      </div>
+    </section>
+
+    <section class="photo-wall" id="wall" aria-label="Photography wall">
+      {wallImages.map(({ path, image }, index) => (
+        <div class="wall-cell" data-file={path.split('/').pop()}>
+          <Image
+            src={image}
+            alt=""
+            widths={[480, 720, 960, 1280, 1600]}
+            sizes="(max-width: 800px) 50vw, 25vw"
+            quality="high"
+            loading={index < 3 ? 'eager' : 'lazy'}
+          />
+        </div>
+      ))}
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

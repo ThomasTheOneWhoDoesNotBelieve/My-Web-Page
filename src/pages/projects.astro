@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { getProjects } from '../lib/projects';
+
+const projects = getProjects();
+const base = import.meta.env.BASE_URL;
+const u = (path: string) => `${base}${path.replace(/^\//, '')}`;
+---
+<BaseLayout title="Projects — Robin Müller">
+  <SiteHeader />
+
+  <main class="projects-page">
+    <section class="projects-intro rule-bottom">
+      <div>
+        <p class="projects-kicker">PHOTOGRAPHY / PROJECTS</p>
+        <h1>PROJECTS</h1>
+      </div>
+      <p class="projects-count">{String(projects.length).padStart(2, '0')} PROJECTS</p>
+    </section>
+
+    <section class="projects-index" aria-label="Photography projects">
+      {projects.map((project) => (
+        <article class="project-row rule-bottom">
+          <div class="project-link-cell">
+            <a
+              class="project-link-button"
+              href={u(`projects/${project.slug}/`)}
+              aria-label={`Open ${project.title}`}
+            >
+              ↗
+            </a>
+          </div>
+
+          <a
+            class="project-cover"
+            href={u(`projects/${project.slug}/`)}
+            aria-label={`Open ${project.title}`}
+          >
+            <Image
+              src={project.cover}
+              alt={project.title}
+              widths={[640, 960, 1280, 1600]}
+              sizes="(max-width: 900px) calc(100vw - 92px), 38vw"
+              quality="high"
+            />
+          </a>
+
+          <div class="project-copy">
+            <a class="project-title" href={u(`projects/${project.slug}/`)}>
+              {project.title}
+            </a>
+
+            <div class="project-copy-bottom">
+              <div class="project-facts">
+                <span>{project.place}</span>
+                <span>{project.date}</span>
+              </div>
+              <p>{project.note}</p>
+            </div>
+          </div>
+
+          <div class="project-number">{project.index}</div>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

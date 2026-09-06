@@ -1,0 +1,164 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { getProjects } from '../../lib/projects';
+
+export function getStaticPaths() {
+  return getProjects().map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+---
+<BaseLayout title={`${project.title} — Robin Müller`}>
+  <SiteHeader />
+
+  <main class="single-project">
+    <section class="single-project-head rule-bottom">
+      <p class="single-project-number">{project.index}</p>
+
+      <div>
+        <h1>{project.title}</h1>
+
+        <div class="single-project-meta">
+          <span>{project.place}</span>
+          <span>{project.date}</span>
+        </div>
+
+        <p class="single-project-note">{project.note}</p>
+      </div>
+    </section>
+
+    <section class="project-gallery" aria-label={`${project.title} gallery`}>
+      {project.photos.map((photo, index) => (
+        <button
+          class:list={[
+            'gallery-photo',
+            photo.height > photo.width ? 'is-portrait' : 'is-landscape',
+          ]}
+          type="button"
+          data-lightbox-item
+          data-index={index}
+          data-src={photo.src}
+          aria-label={`Open photo ${index + 1} of ${project.photos.length}`}
+        >
+          <Image
+            src={photo}
+            alt=""
+            widths={[640, 960, 1280, 1600, 2200]}
+            sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 25vw"
+            quality="high"
+            loading={index < 4 ? 'eager' : 'lazy'}
+          />
+        </button>
+      ))}
+    </section>
+
+    <div class="lightbox" data-lightbox hidden aria-hidden="true">
+      <div class="lightbox-backdrop" data-lightbox-backdrop aria-hidden="true"></div>
+      <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close preview">×</button>
+      <button class="lightbox-prev" type="button" data-lightbox-prev aria-label="Previous photo">‹</button>
+
+      <div class="lightbox-stage" data-lightbox-stage>
+        <img data-lightbox-image alt="" />
+        <div class="lightbox-counter" data-lightbox-counter></div>
+      </div>
+
+      <button class="lightbox-next" type="button" data-lightbox-next aria-label="Next photo">›</button>
+    </div>
+  </main>
+
+  <SiteFooter />
+
+  <script>
+    const gallery = document.querySelector<HTMLElement>('.project-gallery');
+    const items = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-lightbox-item]'));
+    const lightbox = document.querySelector<HTMLElement>('[data-lightbox]');
+
+    function updateProjectGrid() {
+      if (!gallery) return;
+
+      const columns = getComputedStyle(gallery).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+      const columnWidth = gallery.clientWidth / columns;
+      const rowHeight = columnWidth * (2 / 3);
+
+      gallery.style.setProperty('--project-row', `${rowHeight}px`);
+    }
+
+    updateProjectGrid();
+    window.addEventListener('resize', updateProjectGrid);
+    const lightboxImage = document.querySelector<HTMLImageElement>('[data-lightbox-image]');
+    const counter = document.querySelector<HTMLElement>('[data-lightbox-counter]');
+    const closeButton = document.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+    const prevButton = document.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
+    const nextButton = document.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+    const stage = document.querySelector<HTMLElement>('[data-lightbox-stage]');
+    const backdrop = document.querySelector<HTMLElement>('[data-lightbox-backdrop]');
+
+    let currentIndex = 0;
+
+    function show(index) {
+      if (!lightbox || !lightboxImage || items.length === 0) return;
+
+      currentIndex = (index + items.length) % items.length;
+      const item = items[currentIndex];
+      const src = item?.getAttribute('data-src');
+
+      if (!src) return;
+
+      lightboxImage.setAttribute('src', src);
+
+      if (backdrop) {
+        backdrop.style.backgroundImage = `url("${src}")`;
+      }
+
+      if (counter) {
+        counter.textContent =
+          `${String(currentIndex + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
+      }
+    }
+
+    function open(index) {
+      if (!lightbox) return;
+      show(index);
+      lightbox.hidden = false;
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+      closeButton?.focus();
+    }
+
+    function close() {
+      if (!lightbox) return;
+      lightbox.hidden = true;
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      items[currentIndex]?.focus();
+    }
+
+    items.forEach((item, index) => {
+      item.addEventListener('click', () => open(index));
+    });
+
+    closeButton?.addEventListener('click', close);
+    prevButton?.addEventListener('click', () => show(currentIndex - 1));
+    nextButton?.addEventListener('click', () => show(currentIndex + 1));
+
+    lightbox?.addEventListener('click', (event) => {
+      if (event.target === lightbox || event.target === stage) {
+        close();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (!lightbox || lightbox.hidden) return;
+
+      if (event.key === 'Escape') close();
+      if (event.key === 'ArrowLeft') show(currentIndex - 1);
+      if (event.key === 'ArrowRight') show(currentIndex + 1);
+    });
+  </script>
+</BaseLayout>

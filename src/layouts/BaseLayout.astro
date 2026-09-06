@@ -1,0 +1,21 @@
+---
+import '../styles/global.css';
+
+const {
+  title = 'Robin Müller — Photography',
+  description = 'Photography by Robin Müller.'
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#F1EFE7" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
