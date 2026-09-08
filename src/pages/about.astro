@@ -1,0 +1,110 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+type ImageModule = { default: ImageMetadata };
+
+const portraitModules = import.meta.glob<ImageModule>(
+  '../assets/about/portrait.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
+  { eager: true }
+);
+
+const portrait = Object.values(portraitModules)[0]?.default;
+---
+<BaseLayout
+  title="About — Robin Müller"
+  description="About Robin Müller — photography, memory, place, psychology, and education."
+>
+  <SiteHeader />
+
+  <main class="about-page">
+    <section class="about-hero">
+      <div class="about-hero-copy">
+        <div class="about-kicker">
+          <span>ABOUT / 00A</span>
+          <span class="about-cross" aria-hidden="true">+</span>
+        </div>
+
+        <h1>ABOUT</h1>
+
+        <p class="about-subline">CZECHIA / JAPAN</p>
+      </div>
+
+      <div class="about-portrait">
+        {portrait ? (
+          <Image
+            src={portrait}
+            alt="Portrait of Robin Müller"
+            widths={[600, 900, 1200, 1600]}
+            sizes="(max-width: 900px) 100vw, 38vw"
+            quality="high"
+          />
+        ) : (
+          <div class="about-portrait-placeholder">
+            <span>YOUR PORTRAIT / 00A</span>
+            <strong>ROBIN<br />MÜLLER</strong>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <section class="about-bio">
+      <div class="about-index">
+        <span>00A</span>
+        <span>ROBIN MÜLLER</span>
+      </div>
+
+      <div class="about-motto">
+        <p><em>Fortuna Vinum Fundit; Expectatio Fel Admiscet.</em></p>
+      </div>
+
+      <div class="about-body">
+        <p>
+          I am originally from the Czech Republic. When I was nine, my father accepted
+          a position teaching glass art at TIGA in Toyama, Japan, and my family moved
+          there for four years. Those years gave me a second home — a place where I
+          still feel unusually close to myself.
+        </p>
+
+        <p>
+          Through martial arts, sumi-e, and the artistic environment created by my
+          parents, Japanese aesthetics were not something I first encountered as a
+          theory. I experienced them through practice, routine, materials, movement,
+          and place. In that sense, they became less something I learned than
+          something that became part of the way I look.
+        </p>
+
+        <p>
+          After returning to Czechia, I finished high school while continuing martial
+          arts and gradually moving toward the philosophy and psychology behind them.
+          A long-standing fascination with illusion led me into card magic, and from
+          there toward questions of attention, perception, expectation, and the human
+          psyche.
+        </p>
+
+        <p>
+          After graduation, I received a MEXT scholarship from the Japanese
+          government to study in Japan. I spent my first year in Tokyo before choosing
+          Shinshu University in Nagano, where I study pedagogy and psychology. Life
+          here is quieter: mountains are close, and foxes or stray cats appearing near
+          my front door is not particularly unusual.
+        </p>
+
+        <p>
+          In a way, my interests have made a full circle. What began with movement,
+          ink, illusion, glass, and place now returns through psychology, education,
+          and photography —
+          <strong class="about-closing">
+            different ways of asking how we see, what we remember, and what remains
+            after a moment has already passed.
+          </strong>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
