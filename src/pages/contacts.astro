@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+---
+<BaseLayout
+  title="Contacts — Robin Müller"
+  description="Contact Robin Müller by email, Instagram, Facebook, Discord, LINE, or LinkedIn."
+>
+  <SiteHeader />
+
+  <main class="contacts-page">
+    <section class="contacts-hero">
+      <div class="contacts-kicker">
+        <span>CONTACTS / 00C</span>
+        <span class="contacts-cross" aria-hidden="true">+</span>
+      </div>
+
+      <h1>
+        <span>FIND</span>
+        <span>ME</span>
+      </h1>
+
+      <p class="contacts-subline">ONLINE / ELSEWHERE</p>
+    </section>
+
+    <section class="contacts-grid" aria-label="Contact methods">
+      <a
+        class="contact-tile"
+        href="mailto:robin.muller723@gmail.com"
+        aria-label="Email Robin Müller"
+      >
+        <div class="contact-meta">001 / DIRECT</div>
+        <h2>EMAIL</h2>
+        <div class="contact-detail">
+          <span>robin.muller723@gmail.com</span>
+          <span class="contact-arrow" aria-hidden="true">↗</span>
+        </div>
+      </a>
+
+      <a
+        class="contact-tile"
+        href="https://www.instagram.com/ro__obin/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Robin Müller on Instagram"
+      >
+        <div class="contact-meta">002 / SOCIAL</div>
+        <h2>INSTAGRAM</h2>
+        <div class="contact-detail">
+          <span>@ro__obin</span>
+          <span class="contact-arrow" aria-hidden="true">↗</span>
+        </div>
+      </a>
+
+      <a
+        class="contact-tile"
+        href="https://www.facebook.com/profile.php?id=100009844900561"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Robin Müller on Facebook"
+      >
+        <div class="contact-meta">003 / SOCIAL</div>
+        <h2>FACEBOOK</h2>
+        <div class="contact-detail">
+          <span>Robin Muller</span>
+          <span class="contact-arrow" aria-hidden="true">↗</span>
+        </div>
+      </a>
+
+      <div class="contact-tile contact-tile-static">
+        <div class="contact-meta">004 / CHAT</div>
+        <h2>DISCORD</h2>
+        <div class="contact-detail">
+          <span>robinn8661</span>
+        </div>
+      </div>
+
+      <a
+        class="contact-tile"
+        href="https://line.me/ti/p/0Y3Yv0CBID"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Robin Müller on LINE"
+      >
+        <div class="contact-meta">005 / CHAT</div>
+        <h2>LINE</h2>
+        <div class="contact-detail">
+          <span>Robin Müller</span>
+          <span class="contact-arrow" aria-hidden="true">↗</span>
+        </div>
+      </a>
+
+      <div class="contact-tile contact-tile-static contact-tile-coming">
+        <div class="contact-meta">006 / NETWORK</div>
+        <h2>LINKEDIN</h2>
+        <div class="contact-detail">
+          <span>COMING SOON</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

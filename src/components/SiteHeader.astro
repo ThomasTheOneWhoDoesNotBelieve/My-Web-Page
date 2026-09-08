@@ -12,6 +12,6 @@ const page = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
   <nav aria-label="Primary navigation">
     <a href={page('projects/')}>PROJECTS</a>
     <a href={page('about/')}>ABOUT</a>
-    <a href="#" aria-label="Contacts — coming later">CONTACTS</a>
+    <a href={page('contacts/')}>CONTACTS</a>
   </nav>
 </header>
