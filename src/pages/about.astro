@@ -35,13 +35,13 @@ const portrait = Object.values(portraitModules)[0]?.default;
 
       <div class="about-portrait">
         {portrait ? (
-          <Image
-            src={portrait}
-            alt="Portrait of Robin Müller"
-            widths={[600, 900, 1200, 1600]}
-            sizes="(max-width: 900px) 100vw, 38vw"
-            quality="high"
-          />
+        <Image
+          src={portrait}
+          alt="Portrait of Robin Müller"
+          width={1600}
+          sizes="(max-width: 900px) 100vw, 38vw"
+          quality={95}
+        />
         ) : (
           <div class="about-portrait-placeholder">
             <span>YOUR PORTRAIT / 00A</span>

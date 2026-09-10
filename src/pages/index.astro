@@ -40,14 +40,14 @@ const photoCount = String(wallImages.length).padStart(3, '0');
     <section class="photo-wall" id="wall" aria-label="Photography wall">
       {wallImages.map(({ path, image }, index) => (
         <div class="wall-cell" data-file={path.split('/').pop()}>
-          <Image
-            src={image}
-            alt=""
-            widths={[480, 720, 960, 1280, 1600]}
-            sizes="(max-width: 800px) 50vw, 25vw"
-            quality="high"
-            loading={index < 3 ? 'eager' : 'lazy'}
-          />
+      <Image
+        src={image}
+        alt=""
+        width={1600}
+        sizes="(max-width: 800px) 50vw, 25vw"
+        quality={95}
+        loading={index < 3 ? 'eager' : 'lazy'}
+      />
         </div>
       ))}
     </section>

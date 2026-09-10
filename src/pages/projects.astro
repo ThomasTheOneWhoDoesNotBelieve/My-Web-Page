@@ -40,13 +40,13 @@ const u = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
             href={u(`projects/${project.slug}/`)}
             aria-label={`Open ${project.title}`}
           >
-            <Image
-              src={project.cover}
-              alt={project.title}
-              widths={[640, 960, 1280, 1600]}
-              sizes="(max-width: 900px) calc(100vw - 92px), 38vw"
-              quality="high"
-            />
+          <Image
+            src={project.cover}
+            alt={project.title}
+            width={1600}
+            sizes="(max-width: 900px) calc(100vw - 92px), 38vw"
+            quality={95}
+          />
           </a>
 
           <div class="project-copy">
