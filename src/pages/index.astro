@@ -43,10 +43,10 @@ const photoCount = String(wallImages.length).padStart(3, '0');
       <Image
         src={image}
         alt=""
-        width={1600}
+        width={1200}
         sizes="(max-width: 800px) 50vw, 25vw"
         quality={95}
-        loading={index < 3 ? 'eager' : 'lazy'}
+        loading={index < 2 ? 'eager' : 'lazy'}
       />
         </div>
       ))}

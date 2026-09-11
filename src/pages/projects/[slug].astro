@@ -64,10 +64,10 @@ const lightboxImages = await Promise.all(
         <Image
           src={photo}
           alt=""
-          width={1600}
+          width={1200}
           sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 25vw"
           quality={95}
-          loading={index < 4 ? 'eager' : 'lazy'}
+          loading={index === 0 ? 'eager' : 'lazy'}
         />
         </button>
       ))}

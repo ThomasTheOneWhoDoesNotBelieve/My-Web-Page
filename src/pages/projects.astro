@@ -23,7 +23,7 @@ const u = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
     </section>
 
     <section class="projects-index" aria-label="Photography projects">
-      {projects.map((project) => (
+      {projects.map((project, index) => (
         <article class="project-row rule-bottom">
           <div class="project-link-cell">
             <a
@@ -43,9 +43,9 @@ const u = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
           <Image
             src={project.cover}
             alt={project.title}
-            width={1600}
-            sizes="(max-width: 900px) calc(100vw - 92px), 38vw"
+            width={1200}
             quality={95}
+            loading={index < 2 ? 'eager' : 'lazy'}
           />
           </a>
 
