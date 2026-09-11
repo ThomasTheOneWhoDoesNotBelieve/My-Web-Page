@@ -1,22 +1,32 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { getProjects } from '../lib/projects';
 
-// DROP PHOTOS INTO: src/assets/wall/
-// Astro finds them automatically. No list needs to be edited.
-const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/wall/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
-  { eager: true }
+const projects = getProjects();
+
+const allPhotos = projects.flatMap((project) => project.photos);
+
+const wallPool = await Promise.all(
+  allPhotos.map(async (photo) => {
+    const width = Math.min(960, photo.width);
+
+    const optimized = await getImage({
+      src: photo,
+      width,
+      format: 'webp',
+      quality: 88,
+    });
+
+    return {
+      src: optimized.src,
+      width,
+      height: Math.round(photo.height * (width / photo.width)),
+    };
+  })
 );
-
-const wallImages = Object.entries(modules)
-  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([path, module]) => ({ path, image: module.default }));
-
-const photoCount = String(wallImages.length).padStart(3, '0');
 ---
 <BaseLayout>
   <SiteHeader />
@@ -37,20 +47,39 @@ const photoCount = String(wallImages.length).padStart(3, '0');
       </div>
     </section>
 
-    <section class="photo-wall" id="wall" aria-label="Photography wall">
-      {wallImages.map(({ path, image }, index) => (
-        <div class="wall-cell" data-file={path.split('/').pop()}>
-      <Image
-        src={image}
-        alt=""
-        width={1200}
-        sizes="(max-width: 800px) 50vw, 25vw"
-        quality={95}
-        loading={index < 2 ? 'eager' : 'lazy'}
-      />
-        </div>
-      ))}
-    </section>
+    <section class="photo-wall" id="wall" aria-label="Photography wall"></section>
+    
+ <script define:vars={{ wallPool }}>
+  const wall = document.querySelector('#wall');
+
+  if (wall) {
+    const shuffled = [...wallPool];
+
+    // Fisher-Yates shuffle
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const selected = shuffled.slice(0, 24);
+
+    selected.forEach((photo, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'wall-cell';
+
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = '';
+      img.width = photo.width;
+      img.height = photo.height;
+      img.decoding = 'async';
+      img.loading = index < 2 ? 'eager' : 'lazy';
+
+      cell.appendChild(img);
+      wall.appendChild(cell);
+    });
+  }
+  </script>
   </main>
 
   <SiteFooter />
