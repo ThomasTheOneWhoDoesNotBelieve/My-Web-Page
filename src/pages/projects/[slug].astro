@@ -16,13 +16,14 @@ const { project } = Astro.props;
 
 const lightboxImages = await Promise.all(
   project.photos.map(async (photo) => {
-    const width = Math.min(3200, photo.width);
+    const longestSide = Math.max(photo.width, photo.height);
+    const scale = Math.min(1, 2560 / longestSide);
 
     const optimized = await getImage({
       src: photo,
-      width: Math.min(3200, photo.width),
+      width: Math.round(photo.width * scale),
       format: 'webp',
-      quality: 95,
+      quality: 85,
     });
 
     return optimized.src;
@@ -62,13 +63,13 @@ const lightboxImages = await Promise.all(
           aria-label={`Open photo ${index + 1} of ${project.photos.length}`}
         >
         <Image
-          src={photo}
-          alt=""
-          width={1200}
-          sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 25vw"
-          quality={95}
-          loading={index === 0 ? 'eager' : 'lazy'}
-        />
+        src={photo}
+        alt=""
+        width={960}
+        sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 25vw"
+        quality={80}
+        loading={index === 0 ? 'eager' : 'lazy'}
+      />
         </button>
       ))}
     </section>
@@ -115,27 +116,90 @@ const lightboxImages = await Promise.all(
     const backdrop = document.querySelector<HTMLElement>('[data-lightbox-backdrop]');
 
     let currentIndex = 0;
+    let requestId = 0;
 
-    function show(index) {
+    const imageCache = new Map<string, Promise<HTMLImageElement>>();
+
+    function prepareImage(src: string): Promise<HTMLImageElement> {
+      const existing = imageCache.get(src);
+
+      if (existing) {
+        imageCache.delete(src);
+        imageCache.set(src, existing);
+        return existing;
+      }
+
+      const img = new window.Image();
+      img.decoding = 'async';
+      img.src = src;
+
+      const task = img.decode().then(() => img).catch((error) => {
+        imageCache.delete(src);
+        throw error;
+      });
+
+      imageCache.set(src, task);
+
+      // Limit decoded images retained in memory.
+      if (imageCache.size > 3) {
+        const oldest = imageCache.keys().next().value;
+        if (oldest) imageCache.delete(oldest);
+      }
+
+      return task;
+    }
+
+    function show(index: number) {
       if (!lightbox || !lightboxImage || items.length === 0) return;
 
       currentIndex = (index + items.length) % items.length;
+      const request = ++requestId;
+
       const item = items[currentIndex];
       const src = item?.getAttribute('data-src');
-
       if (!src) return;
 
-      lightboxImage.setAttribute('src', src);
+      // Show the gallery version immediately.
+      const thumbnail = item.querySelector<HTMLImageElement>('img');
+      const preview = thumbnail?.currentSrc || thumbnail?.src || src;
 
+      lightboxImage.src = preview;
+
+      // The blurred background also uses the smaller version.
       if (backdrop) {
-        backdrop.style.backgroundImage = `url("${src}")`;
+        backdrop.style.backgroundImage = `url("${preview}")`;
       }
 
       if (counter) {
         counter.textContent =
           `${String(currentIndex + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
       }
+
+      // Load and decode the sharp version without blocking navigation.
+      void prepareImage(src).then(() => {
+        if (request !== requestId || lightbox.hidden) return;
+
+        lightboxImage.src = src;
+
+        // Prepare both neighboring photos for arrow navigation.
+        if (items.length > 1) {
+          const next = items[(currentIndex + 1) % items.length]
+            ?.getAttribute('data-src');
+
+          const previous = items[
+            (currentIndex - 1 + items.length) % items.length
+          ]?.getAttribute('data-src');
+
+          if (next) void prepareImage(next).catch(() => {});
+          if (previous && previous !== next) {
+            void prepareImage(previous).catch(() => {});
+          }
+        }
+      }).catch(() => {
+        // Keep displaying the gallery preview if the full image fails.
+      });
     }
+
 
     function open(index) {
       if (!lightbox) return;
