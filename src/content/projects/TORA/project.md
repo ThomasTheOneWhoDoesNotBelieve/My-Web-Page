@@ -1,5 +1,5 @@
 ---
-title: "TORA – the dog's life"
+title: "TORA"
 place: "Koštálov, Czechia"
 date: "NOVEMBER 2026"
 order: 21
